@@ -202,6 +202,11 @@ SAVE AND RESTART
 
 ---
 
+
+## 13 fix wifi issue maybe
+```bash
+sudo iw dev wlan0 set power_save off
+```
 # Quick Command Reference
 
 ## SSH into the Pi
