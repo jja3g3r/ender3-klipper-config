@@ -99,8 +99,12 @@ The compiled firmware will be located at:
 
     ~/klipper/out/klipper.bin
 
----
+Download on windows:
 
+```bash
+ scp ender3@ender3:~/klipper/out/klipper.bin "$env:USERPROFILE\Downloads\klipper.bin"
+```
+---
 ## 6. Find the SKR USB Serial Name
 
 Connect the SKR Mini E3 V2.0 to the Raspberry Pi using USB.
