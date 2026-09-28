@@ -52,10 +52,16 @@ ssh ender3@ender3
 
 Create a 2 GB swap file:
 ```bash
-sudo fallocate -l 2G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
+sudo nano /etc/dphys-swapfile
+```
+
+Find:
+```
+CONF_SWAPSIZE=100
+```
+and change it, for example, to:
+```
+CONF_SWAPSIZE=2048
 ```
 
 Check that the swap is active:
