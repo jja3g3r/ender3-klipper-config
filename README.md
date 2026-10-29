@@ -50,27 +50,42 @@ ssh ender3@ender3
 
 ## 3. Increase Swap Memory
 
-Create a 2 GB swap file:
+Add a swap file for large updates a 2 GB swap file:
 ```bash
-sudo nano /etc/dphys-swapfile
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon -p 10 /swapfile
 ```
 
-Find:
-```
-CONF_SWAPSIZE=100
-```
-and change it, for example, to:
-```
-CONF_SWAPSIZE=2048
-```
-
-Check that the swap is active:
+make it permanent
 ```bash
+echo '/swapfile none swap sw,pri=10 0 0' | sudo tee -a /etc/fstab
+```
+restart:
+```bash
+sudo restart now
+```
+verify:
+```bash
+swapon --show
 free -h
 ```
+zram had higher prio when i did it
 
+## 4. update
+```bash
+sudo apt update 
+```
+```bash
+sudo apt upgrade
+```
 
-## 4. Configure Klipper Firmware
+## 5. Fix wifi not connecting after update
+
+I found that network connections on newer OS versions are apparently managed by nmtui now. I just entered my SSID and password, and it worked. I had set my Wi-Fi country in raspi-config beforehand, but I’m not sure if that was necessary.
+
+## 5. Configure Klipper Firmware
 
 Go to the Klipper directory:
 ```bash
@@ -94,7 +109,22 @@ Save and exit.
 
 ---
 
-## 5. Compile the Klipper Firmware
+### SKR Mini E3 V3.0 settings
+
+Set:
+
+    Micro-controller Architecture: STMicroelectronics STM32
+    Processor model: STM32G0B1
+    Bootloader offset: 8KiB bootloader
+    Clock Reference: 8MHz crystal
+    Communication interface: Serial(Usart2 PA3/PA2)
+
+Save and exit.
+
+---
+
+
+## 6. Compile the Klipper Firmware
 
 Run:
 ```bash
@@ -108,12 +138,16 @@ The compiled firmware will be located at:
 Download on windows:
 
 ```bash
- scp ender3@ender3:~/klipper/out/klipper.bin "$env:USERPROFILE\Downloads\klipper.bin"
+ scp ender3@ender3:~/klipper/out/klipper.bin "$env:USERPROFILE\Downloads\firmware.bin"
 ```
 ---
-## 6. Find the SKR USB Serial Name
+## 7. Find the SKR USB Serial Name
 
 Connect the SKR Mini E3 V2.0 to the Raspberry Pi using USB.
+
+
+rpi loop selftest:
+python3 -c "import serial; s=serial.Serial('/dev/serial0',115200,timeout=1); s.reset_input_buffer(); s.write(b'test'); s.flush(); print('PASS' if s.read(4)==b'test' else 'FAIL'); s.close()"
 
 Run:
 ```bash
@@ -136,7 +170,7 @@ Use the /dev/serial/by-id/ path instead of /dev/ttyACM0 because the ttyACM numbe
 
 ---
 
-## 7. Copy the Firmware to Windows
+## 8. Copy the Firmware to Windows
 
 From Windows PowerShell:
 ```bash
